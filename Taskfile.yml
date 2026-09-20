@@ -1,5 +1,7 @@
 version: "3"
- 
+
+dotenv: [".env"]
+
 tasks:
   templ:
     desc: Run templ with integrated server and hot reload
@@ -15,3 +17,33 @@ tasks:
     desc: Start development server with hot reload
     cmds:
       - task --parallel tailwind templ
+
+  db:up:
+    desc: Start the Postgres container
+    cmds:
+      - docker compose up -d postgres
+
+  db:down:
+    desc: Stop the Postgres container
+    cmds:
+      - docker compose down
+
+  db:migrate:
+    desc: Apply all pending migrations
+    cmds:
+      - goose up
+
+  db:migrate:down:
+    desc: Roll back the latest migration
+    cmds:
+      - goose down
+
+  db:migrate:status:
+    desc: Show the status of all migrations
+    cmds:
+      - goose status
+
+  db:migrate:create:
+    desc: 'Create a new SQL migration, e.g. task db:migrate:create -- add_users_table'
+    cmds:
+      - goose create {{.CLI_ARGS}} sql

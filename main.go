@@ -1,20 +1,43 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/a-h/templ"
+	"github.com/jackc/pgx/v5/pgxpool"
 
+	"hello-go/internal/api"
+	"hello-go/internal/store"
+	"hello-go/internal/web"
 	"hello-go/pages"
 )
 
 func main() {
+	ctx := context.Background()
+
+	mux := http.NewServeMux()
+
+	pool, err := pgxpool.New(ctx, os.Getenv("GOOSE_DBSTRING"))
+	if err != nil {
+		log.Printf("warning: failed to create db pool: %v", err)
+	} else {
+		defer pool.Close()
+
+		queries := store.New(pool)
+
+		(&api.PostsHandler{Queries: queries}).Register(mux)
+		(&web.PostsHandler{Queries: queries}).Register(mux)
+	}
+
 	component := pages.Home()
-	
-	http.Handle("/", templ.Handler(component))
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+
+	mux.Handle("/", templ.Handler(component))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	fmt.Println("Listening on :8090")
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(":8090", mux)
 }

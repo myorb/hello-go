@@ -1,21 +1,31 @@
 package pages
- 
-import "hello-go/components/card"
- 
+
+import (
+	"hello-go/components/button"
+	"hello-go/components/card"
+)
+
 templ Home() {
 	@layout("Home") {
-		@card.Card(card.Props{Class: "max-w-sm"}) {
-			@card.Header() {
-				@card.Title() {
-					Project Overview
+		<div class="flex flex-col gap-4 p-8">
+			@card.Card(card.Props{Class: "max-w-sm"}) {
+				@card.Header() {
+					@card.Title() {
+						Project Overview
+					}
+					@card.Description() {
+						Track progress and recent activity for your app.
+					}
 				}
-				@card.Description() {
-					Track progress and recent activity for your app.
+				@card.Content() {
+					Your design system is ready. Start building your next component.
+				}
+				@card.Footer() {
+					@button.Button(button.Props{Href: "/posts"}) {
+						View Posts
+					}
 				}
 			}
-			@card.Content() {
-				Your design system is ready. Start building your next component.
-			}
-		}
+		</div>
 	}
 }

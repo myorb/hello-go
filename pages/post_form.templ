@@ -1,0 +1,70 @@
+package pages
+
+import (
+	"hello-go/components/button"
+	"hello-go/components/card"
+	"hello-go/components/input"
+	"hello-go/components/label"
+	"hello-go/components/textarea"
+	"hello-go/internal/store"
+	"strconv"
+)
+
+// PostFormData carries the current field values (submitted or existing) plus
+// any validation error to re-render the form.
+type PostFormData struct {
+	Title string
+	Body  string
+	Error string
+}
+
+templ PostForm(post *store.Post, data PostFormData) {
+	@layout(formHeading(post)) {
+		<div class="mx-auto flex max-w-lg flex-col gap-6 p-8">
+			<h1 class="text-2xl font-semibold">{ formHeading(post) }</h1>
+			@card.Card() {
+				@card.Content() {
+					<form method="post" action={ templ.SafeURL(formAction(post)) } class="flex flex-col gap-4">
+						if data.Error != "" {
+							<p class="text-destructive text-sm">{ data.Error }</p>
+						}
+						<div class="flex flex-col gap-1.5">
+							@label.Label(label.Props{For: "title"}) {
+								Title
+							}
+							@input.Input(input.Props{ID: "title", Name: "title", Value: data.Title, Required: true})
+						</div>
+						<div class="flex flex-col gap-1.5">
+							@label.Label(label.Props{For: "body"}) {
+								Body
+							}
+							@textarea.Textarea(textarea.Props{ID: "body", Name: "body", Value: data.Body, Rows: 5})
+						</div>
+						<div class="flex justify-end gap-2">
+							@button.Button(button.Props{Variant: button.VariantOutline, Href: "/posts"}) {
+								Cancel
+							}
+							@button.Button(button.Props{Type: button.TypeSubmit}) {
+								Save
+							}
+						</div>
+					</form>
+				}
+			}
+		</div>
+	}
+}
+
+func formAction(post *store.Post) string {
+	if post == nil {
+		return "/posts"
+	}
+	return "/posts/" + strconv.FormatInt(int64(post.ID), 10) + "/edit"
+}
+
+func formHeading(post *store.Post) string {
+	if post == nil {
+		return "New Post"
+	}
+	return "Edit Post"
+}

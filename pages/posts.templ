@@ -1,0 +1,59 @@
+package pages
+
+import (
+	"hello-go/components/button"
+	"hello-go/components/card"
+	"hello-go/internal/store"
+	"strconv"
+)
+
+templ PostsIndex(posts []store.Post) {
+	@layout("Posts") {
+		<div class="mx-auto flex max-w-2xl flex-col gap-6 p-8">
+			<div class="flex items-center justify-between">
+				<h1 class="text-2xl font-semibold">Posts</h1>
+				@button.Button(button.Props{Href: "/posts/new"}) {
+					New Post
+				}
+			</div>
+			if len(posts) == 0 {
+				@card.Card() {
+					@card.Content() {
+						No posts yet. Create your first one.
+					}
+				}
+			}
+			for _, p := range posts {
+				@card.Card(card.Props{ID: "post-" + strconv.FormatInt(int64(p.ID), 10)}) {
+					@card.Header() {
+						@card.Title() {
+							{ postText(p.Title) }
+						}
+						@card.Description() {
+							{ postText(p.Body) }
+						}
+						@card.Action() {
+							<div class="flex gap-2">
+								@button.Button(button.Props{Variant: button.VariantOutline, Size: button.SizeSm, Href: "/posts/" + strconv.FormatInt(int64(p.ID), 10) + "/edit"}) {
+									Edit
+								}
+								<form method="post" action={ templ.SafeURL("/posts/" + strconv.FormatInt(int64(p.ID), 10) + "/delete") }>
+									@button.Button(button.Props{Variant: button.VariantDestructive, Size: button.SizeSm, Type: button.TypeSubmit}) {
+										Delete
+									}
+								</form>
+							</div>
+						}
+					}
+				}
+			}
+		</div>
+	}
+}
+
+func postText(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
