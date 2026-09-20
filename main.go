@@ -5,13 +5,16 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
+
+	"hello-go/pages"
 )
 
 func main() {
-	component := hello("John")
+	component := pages.Home()
 	
 	http.Handle("/", templ.Handler(component))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
-	fmt.Println("Listening on :3000")
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("Listening on :8090")
+	http.ListenAndServe(":8090", nil)
 }

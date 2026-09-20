@@ -1,0 +1,21 @@
+package pages
+ 
+import "hello-go/components/card"
+ 
+templ Home() {
+	@layout("Home") {
+		@card.Card(card.Props{Class: "max-w-sm"}) {
+			@card.Header() {
+				@card.Title() {
+					Project Overview
+				}
+				@card.Description() {
+					Track progress and recent activity for your app.
+				}
+			}
+			@card.Content() {
+				Your design system is ready. Start building your next component.
+			}
+		}
+	}
+}
