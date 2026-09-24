@@ -13,10 +13,15 @@ tasks:
     cmds:
       - "tailwindcss -i ./assets/css/globals.css -o ./assets/css/output.css --watch"
  
+  bundle:
+    desc: Rebuild the component JS bundle on changes
+    cmds:
+      - shadcn-templ bundle --watch
+
   dev:
     desc: Start development server with hot reload
     cmds:
-      - task --parallel tailwind templ
+      - task --parallel tailwind bundle templ
 
   db:up:
     desc: Start the Postgres container

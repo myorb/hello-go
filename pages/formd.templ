@@ -7,35 +7,18 @@ import (
 	"hello-go/components/label"
 	"hello-go/components/textarea"
 	"hello-go/internal/store"
-	"strconv"
 )
 
-// PostFormData carries the current field values (submitted or existing) plus
-// any validation error to re-render the form.
-type PostFormData struct {
-	Title string
-	Body  string
-	Error string
-}
-
-templ PostForm(post *store.Post, data PostFormData) {
+templ PostFormHtmx(post *store.Post, data PostFormData) {
 	@layout(formHeading(post)) {
 		<div class="mx-auto flex max-w-lg flex-col gap-6 p-8">
 			<h1 class="text-2xl font-semibold">{ formHeading(post) }</h1>
 			@card.Card() {
 				@card.Content() {
-					@PostFormFields(post, data)
-				}
-			}
-		</div>
-	}
-}
-
-templ PostFormFields(post *store.Post, data PostFormData) {
-	<form
+					<form
 		id="post-form"
 		method="post"
-		action={ templ.SafeURL(formAction(post)) }
+		action={ "post" }
 		hx-post={ templ.SafeURL(formAction(post)) }
 		hx-target="#post-form"
 		hx-swap="outerHTML"
@@ -65,18 +48,8 @@ templ PostFormFields(post *store.Post, data PostFormData) {
 			}
 		</div>
 	</form>
-}
-
-func formAction(post *store.Post) string {
-	if post == nil {
-		return "/posts"
+				}
+			}
+		</div>
 	}
-	return "/posts/" + strconv.FormatInt(int64(post.ID), 10) + "/edit"
-}
-
-func formHeading(post *store.Post) string {
-	if post == nil {
-		return "New Post"
-	}
-	return "Edit Post"
 }

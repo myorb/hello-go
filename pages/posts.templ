@@ -5,16 +5,93 @@ import (
 	"hello-go/components/card"
 	"hello-go/internal/store"
 	"strconv"
+	"hello-go/components/dialog"
+	"hello-go/components/field"
+	"hello-go/components/input"
+	"hello-go/components/label"
 )
 
+// import (
+// 	"github.com/axadrn/shadcn-templ/v2/components/button"
+// 	"github.com/axadrn/shadcn-templ/v2/components/dialog"
+// 	"github.com/axadrn/shadcn-templ/v2/components/field"
+// 	"github.com/axadrn/shadcn-templ/v2/components/input"
+// 	"github.com/axadrn/shadcn-templ/v2/components/label"
+// )
+ 
 templ PostsIndex(posts []store.Post) {
 	@layout("Posts") {
 		<div class="mx-auto flex max-w-2xl flex-col gap-6 p-8">
 			<div class="flex items-center justify-between">
 				<h1 class="text-2xl font-semibold">Posts</h1>
-				@button.Button(button.Props{Href: "/posts/new"}) {
-					New Post
+				// @button.Button(button.Props{Href: "/posts/new"}) {
+				// 	New Post
+				// }
+@AlertDialogDemo()
+				// @dialog.Dialog() {
+				// 	@button.Button(button.Props{Attributes: dialog.Trigger(ctx)}) {
+				// 		Open
+				// 	}
+				// 	@dialog.Content() {
+				// 		@dialog.Header() {
+				// 			@dialog.Title() {
+				// 				Are you absolutely sure?
+				// 			}
+				// 			@dialog.Description() {
+				// 				This action cannot be undone.
+				// 			}
+				// 		}
+				// 	}
+				// }
+
+
+				
+	@dialog.Dialog() {
+		<form>
+			@button.Button(button.Props{
+				Variant:    button.VariantOutline,
+				Attributes: dialog.Trigger(ctx),
+			}) {
+				Open Dialog
+			}
+			@dialog.Content(dialog.ContentProps{Class: "sm:max-w-sm"}) {
+				@dialog.Header() {
+					@dialog.Title() {
+						Edit profile
+					}
+					@dialog.Description() {
+						Make changes to your profile here. Click save when you're done.
+					}
 				}
+				@field.Group() {
+					@field.Field() {
+						@label.Label(label.Props{For: "name-1"}) {
+							Name
+						}
+						@input.Input(input.Props{ID: "name-1", Name: "name", Value: "Axel Adrian"})
+					}
+					@field.Field() {
+						@label.Label(label.Props{For: "username-1"}) {
+							Username
+						}
+						@input.Input(input.Props{ID: "username-1", Name: "username", Value: "@axadrn"})
+					}
+				}
+				@dialog.Footer() {
+					@button.Button(button.Props{
+						Variant:    button.VariantOutline,
+						Attributes: dialog.Close(ctx),
+					}) {
+						Cancel
+					}
+					@button.Button(button.Props{Type: button.TypeSubmit}) {
+						Save changes
+					}
+				}
+			}
+		</form>
+	}
+
 			</div>
 			if len(posts) == 0 {
 				@card.Card() {

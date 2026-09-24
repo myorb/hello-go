@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "dir": "assets/js",
+    "path": "/assets/js"
+  },
   "$schema": "https://shadcn-templ.com/schema/components.json",
   "style": "base-vega",
   "tailwind": {

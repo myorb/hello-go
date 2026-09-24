@@ -1,4 +1,4 @@
-package store
+package main
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"hello-go/internal/api"
 	"hello-go/internal/store"
 	"hello-go/internal/web"
 	"hello-go/pages"
@@ -29,7 +28,6 @@ func main() {
 
 		queries := store.New(pool)
 
-		(&api.PostsHandler{Queries: queries}).Register(mux)
 		(&web.PostsHandler{Queries: queries}).Register(mux)
 	}
 

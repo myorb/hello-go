@@ -52,7 +52,7 @@ func (h *PostsHandler) create(w http.ResponseWriter, r *http.Request) {
 	body := strings.TrimSpace(r.PostFormValue("body"))
 
 	if title == "" {
-		render(w, r, pages.PostForm(nil, pages.PostFormData{Title: title, Body: body, Error: "Title is required."}))
+		renderPostForm(w, r, nil, pages.PostFormData{Title: title, Body: body, Error: "Title is required."})
 		return
 	}
 
@@ -61,10 +61,15 @@ func (h *PostsHandler) create(w http.ResponseWriter, r *http.Request) {
 		Body:  strPtr(body),
 	})
 	if err != nil {
-		render(w, r, pages.PostForm(nil, pages.PostFormData{Title: title, Body: body, Error: err.Error()}))
+		renderPostForm(w, r, nil, pages.PostFormData{Title: title, Body: body, Error: err.Error()})
 		return
 	}
 
+	if isHTMX(r) {
+		w.Header().Set("HX-Redirect", "/posts")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	http.Redirect(w, r, "/posts", http.StatusSeeOther)
 }
 
@@ -104,7 +109,7 @@ func (h *PostsHandler) update(w http.ResponseWriter, r *http.Request) {
 
 	if title == "" {
 		post := store.Post{ID: id}
-		render(w, r, pages.PostForm(&post, pages.PostFormData{Title: title, Body: body, Error: "Title is required."}))
+		renderPostForm(w, r, &post, pages.PostFormData{Title: title, Body: body, Error: "Title is required."})
 		return
 	}
 
@@ -118,10 +123,15 @@ func (h *PostsHandler) update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		render(w, r, pages.PostForm(&post, pages.PostFormData{Title: title, Body: body, Error: err.Error()}))
+		renderPostForm(w, r, &post, pages.PostFormData{Title: title, Body: body, Error: err.Error()})
 		return
 	}
 
+	if isHTMX(r) {
+		w.Header().Set("HX-Redirect", "/posts")
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	http.Redirect(w, r, "/posts", http.StatusSeeOther)
 }
 
@@ -164,4 +174,20 @@ func render(w http.ResponseWriter, r *http.Request, c templ.Component) {
 	if err := c.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func renderPostForm(w http.ResponseWriter, r *http.Request, post *store.Post, data pages.PostFormData) {
+	if isHTMX(r) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		if err := pages.PostFormFields(post, data).Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	render(w, r, pages.PostForm(post, data))
+}
+
+func isHTMX(r *http.Request) bool {
+	return r.Header.Get("HX-Request") == "true"
 }
